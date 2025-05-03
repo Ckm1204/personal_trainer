@@ -9,4 +9,12 @@ class RegisterUseCase {
   Future<User> call(String email, String password) {
     return repository.register(email, password);
   }
+
+  Future<void> register(String email, String password, String name) {
+    return repository.register(email, password);
+  }
+
+
+
+
 }

@@ -53,4 +53,41 @@ class RemoteDataSource {
       print('[❌] Error al cerrar sesión: $e');
     }
   }
+
+  Future<bool> isLoggedIn() async {
+    try {
+      await _account.get();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<User> getCurrentUser() async {
+    try {
+      final appwrite_models.User user = await _account.get();
+      return User(id: user.$id, email: user.email);
+    } on AppwriteException catch (e) {
+      print('[❌] AppwriteException: ${e.message}');
+      rethrow;
+    } catch (e) {
+      print('[❌] Error inesperado al obtener usuario: $e');
+      rethrow;
+    }
+  }
+
+  Future<String> getUserId() async {
+    try {
+      final appwrite_models.User user = await _account.get();
+      return user.$id;
+    } on AppwriteException catch (e) {
+      print('[❌] AppwriteException: ${e.message}');
+      rethrow;
+    } catch (e) {
+      print('[❌] Error inesperado al obtener ID de usuario: $e');
+      rethrow;
+    }
+  }
+
+
 }

@@ -1,24 +1,35 @@
-// main.dart
+// lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:personal_trainer/utils/data/datasources/provider/app_write_provider.dart';
-import 'package:personal_trainer/utils/data/datasources/remote_data_source.dart';
-import 'package:personal_trainer/utils/repositories/auth_repository_impl.dart';
-import 'package:personal_trainer/utils/domain/usecases/login_usecase.dart';
-import 'package:personal_trainer/utils/domain/usecases/register_usecase.dart';
+import 'package:personal_trainer/domain/data/datasources/provider/app_write_provider.dart';
+import 'package:personal_trainer/domain/data/datasources/remote_data_source.dart';
+import 'package:personal_trainer/domain/domain/usecases/all_methods_user_usecase.dart';
+import 'package:personal_trainer/domain/repositories/auth_repository_impl.dart';
+import 'package:personal_trainer/domain/domain/usecases/login_usecase.dart';
+import 'package:personal_trainer/domain/domain/usecases/register_usecase.dart';
+import 'package:personal_trainer/modules/presentation/auth_controller.dart';
 
-import 'modules/presentation/auth_controller.dart';
+import 'domain/core/services/auth_service.dart';
+import 'modules/home/pages/home_page.dart';
 import 'modules/presentation/pages/login_page.dart';
 
-void main() {
-  WidgetsFlutterBinding.ensureInitialized(); // Add this line
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Inicializa los servicios
   final appWriteProvider = AppWriteProvider();
+  Get.put(appWriteProvider);
+
   final remoteDataSource = RemoteDataSource(appWriteProvider.client);
   final authRepository = AuthRepositoryImpl(remoteDataSource);
 
   Get.put(RegisterUseCase(authRepository));
+  Get.put(AllMethodsUser(authRepository));
   Get.put(LoginUseCase(authRepository));
   Get.put(AuthController());
+
+  // Inicializa y espera el AuthService
+  await Get.putAsync(() => AuthService().init());
 
   runApp(const MyApp());
 }
@@ -35,7 +46,19 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const LoginPage(),
+      home: const AuthenticationWrapper(),
+    );
+  }
+}
+
+class AuthenticationWrapper extends GetWidget<AuthService> {
+  const AuthenticationWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() => controller.isAuthenticated.value
+      ? const HomePage()
+      : const LoginPage()
     );
   }
 }

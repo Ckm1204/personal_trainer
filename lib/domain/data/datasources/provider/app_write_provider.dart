@@ -6,6 +6,8 @@ class AppWriteProvider {
   AppWriteProvider() {
     client
         .setEndpoint('https://cloud.appwrite.io/v1') // Your Appwrite endpoint
-        .setProject('67f46dc9003a5cdc675f');
+        .setProject('67f46dc9003a5cdc675f'); // Your Appwrite project ID
   }
+
+
 }

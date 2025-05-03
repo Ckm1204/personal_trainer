@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import '../../presentation/auth_controller.dart';
 import '../../presentation/pages/login_page.dart';
 
 class HomePage extends StatelessWidget {
@@ -8,6 +8,8 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<AuthController>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Inicio'),
@@ -15,15 +17,33 @@ class HomePage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              Get.offAll(() => const LoginPage());
+              controller.logout();
             },
           )
         ],
       ),
-      body: const Center(
-        child: Text(
-          '¡Bienvenido!',
-          style: TextStyle(fontSize: 24),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              '¡Bienvenido!',
+              style: TextStyle(fontSize: 24),
+            ),
+            const SizedBox(height: 8),
+            FutureBuilder<String>(
+              future: controller.getUserIdd(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                }
+                return Text(
+                  'ID: ${snapshot.data ?? "No disponible"}',
+                  style: const TextStyle(fontSize: 16),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
