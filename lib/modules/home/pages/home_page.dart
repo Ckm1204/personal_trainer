@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../presentation/auth_controller.dart';
-import '../../presentation/pages/login_page.dart';
+import '../../questions/pages/questionnaire_page.dart';
+
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -42,6 +43,11 @@ class HomePage extends StatelessWidget {
                   style: const TextStyle(fontSize: 16),
                 );
               },
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => Get.to(() => const QuestionnaireFitnessPage()),
+              child: const Text('Comenzar Cuestionario'),
             ),
           ],
         ),
