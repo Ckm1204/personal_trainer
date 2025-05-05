@@ -26,7 +26,8 @@ class FitnessQuestionnaire {
   final int weeklyTrainingHours;
   final Map<String, String> otherAnswers;
 
-  FitnessQuestionnaire({
+  FitnessQuestionnaire(
+      {
     required this.userId,
     required this.fitnessGoals,
     required this.timelineGoal,
@@ -47,13 +48,14 @@ class FitnessQuestionnaire {
     required this.trainingPreferences,
     required this.weeklyTrainingHours,
     required this.otherAnswers,
-  });
+  }
+  );
 
   Map<String, dynamic> toJson() {
     return {
       'id': ID.unique(), // Use $id instead of id
       'userId': userId,
-      'data': jsonEncode({
+      'dataFitness': jsonEncode({
         'fitnessGoals': fitnessGoals,
         'timelineGoal': timelineGoal,
         'motivations': motivations,

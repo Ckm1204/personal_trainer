@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:personal_trainer/modules/profile/widgets/profile_widget.dart';
 import '../../presentation/auth_controller.dart';
 import '../../questions/pages/questionnaire_page.dart';
 import '../widget/home_widget.dart';
@@ -27,7 +28,7 @@ class HomePage extends StatelessWidget {
         index: currentIndex.value,
         children: const [
           HomeContent(),
-          //ProfilePage(),
+          ProfileWidget(),
           //ProgressPage(),
           //SettingsPage(),
         ],
