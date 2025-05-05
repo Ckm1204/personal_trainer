@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../domain/data/datasources/provider/app_write_provider.dart';
+import '../../home/pages/home_page.dart';
 import '../questionnaire_fitness_controller.dart';
 import '../widgets/questionnaire_fitness_widget.dart';
 
@@ -134,7 +135,18 @@ class QuestionnaireFitnessPage extends StatelessWidget {
               const SizedBox(height: 20),
               Center(
                 child: ElevatedButton(
-                  onPressed: () => controller.submitQuestionnaire(),
+                  onPressed: () {
+                    controller.submitQuestionnaire();
+                    Get.offAll(() => const HomePage());
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
                   child: const Text('Enviar cuestionario'),
                 ),
               ),
