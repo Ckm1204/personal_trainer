@@ -26,6 +26,14 @@ class FitnessQuestionnaire {
   final int weeklyTrainingHours;
   final Map<String, String> otherAnswers;
 
+  final String birthDate;
+  final String gender;
+  final String height;
+  final String username;
+  final String weight;
+
+
+
   FitnessQuestionnaire(
       {
     required this.userId,
@@ -48,6 +56,12 @@ class FitnessQuestionnaire {
     required this.trainingPreferences,
     required this.weeklyTrainingHours,
     required this.otherAnswers,
+
+    required this.birthDate,
+    required this.gender,
+    required this.height,
+    required this.weight,
+    required this.username,
   }
   );
 
@@ -75,6 +89,14 @@ class FitnessQuestionnaire {
         'trainingPreferences': trainingPreferences,
         'weeklyTrainingHours': weeklyTrainingHours,
         'otherAnswers': otherAnswers,
+
+      }),
+      'dataUser':jsonEncode({
+        'birthDate':birthDate,
+        'gender':gender,
+        'height':height,
+        'username':username,
+        'weight':weight,
       })
     };
   }

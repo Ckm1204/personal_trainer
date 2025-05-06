@@ -29,6 +29,13 @@ class QuestionnaireFitnessController extends GetxController {
   final weeklyTrainingHours = 0.obs;
   final otherAnswers = <String, String>{}.obs;
   final isLoading = false.obs;
+  final birthDate = DateTime.now().obs;  // Rx<DateTime> instead of RxString
+// Agregar aquí las nuevas variables
+  final gender = ''.obs;
+  final height = ''.obs;
+  final username = ''.obs;
+  final weight = ''.obs;
+
 
   final AppWriteProvider appWriteProvider;
   final AuthController authController = Get.find<AuthController>();
@@ -36,8 +43,6 @@ class QuestionnaireFitnessController extends GetxController {
 
   QuestionnaireFitnessController(this.appWriteProvider) {
     databases = Databases(appWriteProvider.client);
-
-
   }
 
  Future<void> submitQuestionnaire() async {
@@ -63,6 +68,8 @@ class QuestionnaireFitnessController extends GetxController {
          ],
        );
 
+       final formattedDate = birthDate.value.toIso8601String();
+
        final questionnaire = FitnessQuestionnaire(
          userId: userId,
          fitnessGoals: fitnessGoals,
@@ -84,6 +91,12 @@ class QuestionnaireFitnessController extends GetxController {
          trainingPreferences: trainingPreferences,
          weeklyTrainingHours: weeklyTrainingHours.value,
          otherAnswers: otherAnswers,
+
+         birthDate: formattedDate,
+         gender: gender.value,
+         height: height.value,
+         username: username.value,
+         weight: weight.value,
        );
 
        if (existingDoc.documents.isNotEmpty) {
