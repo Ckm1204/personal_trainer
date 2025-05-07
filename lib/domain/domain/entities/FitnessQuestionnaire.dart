@@ -100,4 +100,38 @@ class FitnessQuestionnaire {
       })
     };
   }
+
+  factory FitnessQuestionnaire.fromJson(Map<String, dynamic> json) {
+    final dataFitness = jsonDecode(json['dataFitness']);
+    final dataUser = jsonDecode(json['dataUser']);
+
+    return FitnessQuestionnaire(
+      userId: json['userId'],
+      fitnessGoals: List<String>.from(dataFitness['fitnessGoals']),
+      timelineGoal: dataFitness['timelineGoal'],
+      motivations: List<String>.from(dataFitness['motivations']),
+      previousAttempts: List<String>.from(dataFitness['previousAttempts']),
+      commitmentLevel: dataFitness['commitmentLevel'],
+      preferredActivities: List<String>.from(dataFitness['preferredActivities']),
+      medicalConditions: List<String>.from(dataFitness['medicalConditions']),
+      medications: List<String>.from(dataFitness['medications']),
+      allergies: List<String>.from(dataFitness['allergies']),
+      energyLevel: dataFitness['energyLevel'],
+      sleepQuality: dataFitness['sleepQuality'],
+      activityLevel: dataFitness['activityLevel'],
+      dietaryRestrictions: List<String>.from(dataFitness['dietaryRestrictions']),
+      eatingHabits: dataFitness['eatingHabits'],
+      alcoholConsumption: dataFitness['alcoholConsumption'],
+      smokingStatus: dataFitness['smokingStatus'],
+      trainingPreferences: List<String>.from(dataFitness['trainingPreferences']),
+      weeklyTrainingHours: dataFitness['weeklyTrainingHours'],
+      otherAnswers: Map<String, String>.from(dataFitness['otherAnswers']),
+      birthDate: dataUser['birthDate'],
+      gender: dataUser['gender'],
+      height: dataUser['height'],
+      username: dataUser['username'],
+      weight: dataUser['weight'],
+    );
+  }
+
 }
