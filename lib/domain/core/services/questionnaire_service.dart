@@ -13,7 +13,7 @@ class QuestionnaireService {
 
   QuestionnaireService() : appWriteProvider = Get.find<AppWriteProvider>();
 
-  Future<FitnessQuestionnaire?> getQuestionnaireByUserId(String userId) async {
+  Future<FitnessQuestionnaire?> getQuestionnaireCompleteByUserId(String userId) async {
     try {
       final databases = Databases(appWriteProvider.client);
       final response = await databases.listDocuments(
@@ -29,4 +29,6 @@ class QuestionnaireService {
       return null;
     }
   }
+
+
 }

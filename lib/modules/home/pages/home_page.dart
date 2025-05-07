@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:personal_trainer/modules/ia_service/weekly_diet_page.dart';
 import 'package:personal_trainer/modules/profile/widgets/profile_widget.dart';
 import '../../presentation/auth_controller.dart';
 import '../../questions/pages/questionnaire_details_page.dart';
@@ -17,7 +18,7 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Inicio'),
+        title: const Text('Entrenador Personal'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -30,7 +31,8 @@ class HomePage extends StatelessWidget {
         children: const [
           HomeContent(),
           ProfileWidget(),
-          QuestionnaireDetailsScreen(),          //SettingsPage(),
+          QuestionnaireDetailsScreen(),
+          WeeklyDietScreen()//SettingsPage(),
         ],
       )),
       bottomNavigationBar: Obx(() => BottomNavigationBar(

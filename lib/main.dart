@@ -1,5 +1,6 @@
 // lib/main.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:personal_trainer/domain/data/datasources/provider/app_write_provider.dart';
 import 'package:personal_trainer/domain/data/datasources/remote_data_source.dart';
@@ -14,6 +15,8 @@ import 'modules/home/pages/home_page.dart';
 import 'modules/presentation/pages/login_page.dart';
 
 void main() async {
+  await dotenv.load(fileName: ".env");
+
   WidgetsFlutterBinding.ensureInitialized();
 
   // Inicializa los servicios
@@ -27,6 +30,8 @@ void main() async {
   Get.put(AllMethodsUser(authRepository));
   Get.put(LoginUseCase(authRepository));
   Get.put(AuthController());
+
+
 
   // Inicializa y espera el AuthService
   await Get.putAsync(() => AuthService().init());

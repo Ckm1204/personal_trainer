@@ -38,7 +38,7 @@ class _QuestionnaireDetailsScreenState extends State<QuestionnaireDetailsScreen>
     setState(() => _isLoading = true);
 
     try {
-      _questionnaire = await _service.getQuestionnaireByUserId(_userId!);
+      _questionnaire = await _service.getQuestionnaireCompleteByUserId(_userId!);
     } catch (e) {
       print('Error al cargar el cuestionario: $e');
     } finally {
