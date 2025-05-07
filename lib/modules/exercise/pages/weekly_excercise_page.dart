@@ -1,24 +1,22 @@
-// lib/modules/diet/pages/weekly_diet_screen.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:personal_trainer/modules/ia_service/service/fiteness_recomendation_service.dart';
 import '../../../domain/core/services/questionnaire_service.dart';
-import '../presentation/auth_controller.dart';
+import '../../ia_service/service/fitness_exercise_service.dart';
+import '../../presentation/auth_controller.dart';
 
-
-class WeeklyDietScreen extends StatefulWidget {
-  const WeeklyDietScreen({super.key});
+class WeeklyExerciseScreen extends StatefulWidget {
+  const WeeklyExerciseScreen({super.key});
 
   @override
-  State<WeeklyDietScreen> createState() => _WeeklyDietScreenState();
+  State<WeeklyExerciseScreen> createState() => _WeeklyExerciseScreenState();
 }
 
-class _WeeklyDietScreenState extends State<WeeklyDietScreen> {
-  final DietSuggestionService _dietService = DietSuggestionService();
+class _WeeklyExerciseScreenState extends State<WeeklyExerciseScreen> {
+  final ExerciseSuggestionService _exerciseService = ExerciseSuggestionService();
   final QuestionnaireService _questionnaireService = QuestionnaireService();
   final AuthController _authController = Get.find<AuthController>();
 
-  Map<String, List<String>> weeklyDiet = {};
+  Map<String, List<String>> weeklyExercises = {};
   bool _isLoading = true;
   String? _userId;
   String _errorMessage = '';
@@ -27,7 +25,7 @@ class _WeeklyDietScreenState extends State<WeeklyDietScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadDiet();
+      _loadExercises();
     });
   }
 
@@ -41,17 +39,14 @@ class _WeeklyDietScreenState extends State<WeeklyDietScreen> {
     }
   }
 
-  // lib/modules/ia_service/weekly_diet_page.dart
-  // Update the _loadDiet method:
-
-  Future<void> _loadDiet() async {
+  Future<void> _loadExercises() async {
     if (mounted) {
       setState(() => _isLoading = true);
     }
 
     try {
       await _loadUserId();
-      print('1. User ID after loading: $_userId'); // Debug print
+      print('1. User ID after loading: $_userId');
 
       if (_userId == null) {
         setState(() {
@@ -62,7 +57,7 @@ class _WeeklyDietScreenState extends State<WeeklyDietScreen> {
       }
 
       final questionnaire = await _questionnaireService.getQuestionnaireCompleteByUserId(_userId!);
-      print('2. Questionnaire loaded: ${questionnaire != null}'); // Debug print
+      print('2. Questionnaire loaded: ${questionnaire != null}');
 
       if (questionnaire == null) {
         setState(() {
@@ -72,21 +67,21 @@ class _WeeklyDietScreenState extends State<WeeklyDietScreen> {
         return;
       }
 
-      print('3. Generating diet plan...'); // Debug print
-      final diet = await _dietService.generateWeeklyDiet(questionnaire);
-      print('4. Diet plan generated: ${diet.length} days'); // Debug print
+      print('3. Generating exercise plan...');
+      final exercises = await _exerciseService.generateWeeklyExercises(questionnaire);
+      print('4. Exercise plan generated: ${exercises.length} days');
 
       if (mounted) {
         setState(() {
-          weeklyDiet = diet;
+          weeklyExercises = exercises;
           _isLoading = false;
         });
       }
     } catch (e) {
-      print('Error in _loadDiet: $e'); // Detailed error
+      print('Error in _loadExercises: $e');
       if (mounted) {
         setState(() {
-          _errorMessage = 'Error al cargar el plan de comidas: $e';
+          _errorMessage = 'Error al cargar el plan de ejercicios: $e';
           _isLoading = false;
         });
       }
@@ -97,7 +92,7 @@ class _WeeklyDietScreenState extends State<WeeklyDietScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Plan Semanal de Comidas'),
+        title: const Text('Plan Semanal de Ejercicios'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: _isLoading
@@ -107,40 +102,40 @@ class _WeeklyDietScreenState extends State<WeeklyDietScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(_errorMessage,
+                      Text(
+                        _errorMessage,
                         style: const TextStyle(color: Colors.red),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton(
-                        onPressed: _loadDiet,
+                        onPressed: _loadExercises,
                         child: const Text('Reintentar'),
                       ),
                     ],
                   ),
                 )
-              : weeklyDiet.isEmpty
+              : weeklyExercises.isEmpty
                   ? const Center(
-                      child: Text('No hay un plan de comidas disponible'),
+                      child: Text('No hay un plan de ejercicios disponible'),
                     )
                   : ListView.builder(
                       padding: const EdgeInsets.all(16),
-                      itemCount: weeklyDiet.length,
+                      itemCount: weeklyExercises.length,
                       itemBuilder: (context, index) {
                         final day = 'Día ${index + 1}';
-                        final meals = weeklyDiet[day] ?? [];
+                        final exercises = weeklyExercises[day] ?? [];
 
                         return Card(
                           margin: const EdgeInsets.only(bottom: 16),
                           child: ExpansionTile(
-                            title: Text(day,
-                              style: const TextStyle(fontWeight: FontWeight.bold)
+                            title: Text(
+                              day,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            children: [
-                              _buildMealTile('Desayuno', meals.isNotEmpty ? meals[0] : ''),
-                              _buildMealTile('Almuerzo', meals.length > 1 ? meals[1] : ''),
-                              _buildMealTile('Cena', meals.length > 2 ? meals[2] : ''),
-                            ],
+                            children: exercises
+                                .map((exercise) => _buildExerciseTile(exercise))
+                                .toList(),
                           ),
                         );
                       },
@@ -148,10 +143,10 @@ class _WeeklyDietScreenState extends State<WeeklyDietScreen> {
     );
   }
 
-  Widget _buildMealTile(String title, String meal) {
+  Widget _buildExerciseTile(String exercise) {
     return ListTile(
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-      subtitle: Text(meal),
+      leading: const Icon(Icons.fitness_center),
+      title: Text(exercise),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     );
   }

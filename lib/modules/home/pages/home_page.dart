@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:personal_trainer/modules/ia_service/weekly_diet_page.dart';
+import 'package:personal_trainer/modules/diet/pages/weekly_diet_page.dart';
+import 'package:personal_trainer/modules/exercise/pages/weekly_excercise_page.dart';
 import 'package:personal_trainer/modules/profile/widgets/profile_widget.dart';
 import '../../presentation/auth_controller.dart';
 import '../../questions/pages/questionnaire_details_page.dart';
@@ -29,10 +30,12 @@ class HomePage extends StatelessWidget {
       body: Obx(() => IndexedStack(
         index: currentIndex.value,
         children: const [
-          HomeContent(),
+          // Aqui van las pantallas de la app
+          WeeklyDietScreen(),
+          WeeklyExerciseScreen(),
+          //HomeContent(),
           ProfileWidget(),
           QuestionnaireDetailsScreen(),
-          WeeklyDietScreen()//SettingsPage(),
         ],
       )),
       bottomNavigationBar: Obx(() => BottomNavigationBar(

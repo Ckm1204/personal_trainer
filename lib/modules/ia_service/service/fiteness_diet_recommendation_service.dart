@@ -4,6 +4,7 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 import '../../../domain/domain/entities/FitnessQuestionnaire.dart';
 
 class DietSuggestionService {
+
   Future<Map<String, List<String>>> generateWeeklyDiet(FitnessQuestionnaire questionnaire) async {
     try {
       final apiKey = dotenv.env['GEMINI_API_KEY'];
@@ -15,66 +16,66 @@ class DietSuggestionService {
 
       print('2. Creating Gemini model...'); // Debug print
       final model = GenerativeModel(
-        model: 'gemini-2.0-flash-lite',  // Changed to gemini-pro for better results
+        model: 'gemini-2.0-flash-lite', // Use the appropriate model name
         apiKey: apiKey,
       );
 
       print('3. Building prompt...'); // Debug print
       final prompt = '''
-Actúa como un nutricionista profesional experto. Crea un plan detallado de comidas para 7 días basado en:
-Peso: ${questionnaire.weight} kg
-Altura: ${questionnaire.height} cm
-Género: ${questionnaire.gender}
-Objetivos: ${questionnaire.fitnessGoals.join(', ')}
-Restricciones: ${questionnaire.dietaryRestrictions.join(', ')}
-Hábitos: ${questionnaire.eatingHabits}
-Actividad: ${questionnaire.activityLevel}
-Condiciones médicas: ${questionnaire.medicalConditions.join(', ')}
-Alergias: ${questionnaire.allergies.join(', ')}
-
-Genera un plan de comidas nutritivo y balanceado.
-Responde EXACTAMENTE en este formato:
-
-Día 1:
-Desayuno: [comida detallada]
-Almuerzo: [comida detallada]
-Cena: [comida detallada]
-
-Día 2:
-Desayuno: [comida detallada]
-Almuerzo: [comida detallada]
-Cena: [comida detallada]
-
-Día 3:
-Desayuno: [comida detallada]
-Almuerzo: [comida detallada]
-Cena: [comida detallada]
-
-Día 4:
-Desayuno: [comida detallada]
-Almuerzo: [comida detallada]
-Cena: [comida detallada]
-
-Día 5:
-Desayuno: [comida detallada]
-Almuerzo: [comida detallada]
-Cena: [comida detallada]
-
-
-Día 6:
-Desayuno: [comida detallada]
-Almuerzo: [comida detallada]
-Cena: [comida detallada]
-
-
-Día 7:
-Desayuno: [comida detallada]
-Almuerzo: [comida detallada]
-Cena: [comida detallada]
-
-Asegúrate de que cada comida sea saludable y adecuada para el perfil del usuario. No incluyas explicaciones, solo el plan de comidas.
-
-''';
+        Actúa como un nutricionista profesional experto. Crea un plan detallado de comidas para 7 días basado en:
+        Peso: ${questionnaire.weight} kg
+        Altura: ${questionnaire.height} cm
+        Género: ${questionnaire.gender}
+        Objetivos: ${questionnaire.fitnessGoals.join(', ')}
+        Restricciones: ${questionnaire.dietaryRestrictions.join(', ')}
+        Hábitos: ${questionnaire.eatingHabits}
+        Actividad: ${questionnaire.activityLevel}
+        Condiciones médicas: ${questionnaire.medicalConditions.join(', ')}
+        Alergias: ${questionnaire.allergies.join(', ')}
+        
+        Genera un plan de comidas nutritivo y balanceado.
+        Responde EXACTAMENTE en este formato:
+        
+        Día 1:
+        Desayuno: [comida detallada]
+        Almuerzo: [comida detallada]
+        Cena: [comida detallada]
+        
+        Día 2:
+        Desayuno: [comida detallada]
+        Almuerzo: [comida detallada]
+        Cena: [comida detallada]
+        
+        Día 3:
+        Desayuno: [comida detallada]
+        Almuerzo: [comida detallada]
+        Cena: [comida detallada]
+        
+        Día 4:
+        Desayuno: [comida detallada]
+        Almuerzo: [comida detallada]
+        Cena: [comida detallada]
+        
+        Día 5:
+        Desayuno: [comida detallada]
+        Almuerzo: [comida detallada]
+        Cena: [comida detallada]
+        
+        
+        Día 6:
+        Desayuno: [comida detallada]
+        Almuerzo: [comida detallada]
+        Cena: [comida detallada]
+        
+        
+        Día 7:
+        Desayuno: [comida detallada]
+        Almuerzo: [comida detallada]
+        Cena: [comida detallada]
+        
+        Asegúrate de que cada comida sea saludable y adecuada para el perfil del usuario. No incluyas explicaciones, solo el plan de comidas.
+        
+        ''';
 
       print('4. Sending request to Gemini...'); // Debug print
       final content = [Content.text(prompt)];
@@ -156,4 +157,8 @@ Asegúrate de que cada comida sea saludable y adecuada para el perfil del usuari
       return {};
     }
   }
+
+
+
+
 }
