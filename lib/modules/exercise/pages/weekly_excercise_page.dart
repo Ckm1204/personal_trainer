@@ -1,8 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+
 import '../../../domain/core/services/questionnaire_service.dart';
 import '../../ia_service/service/fitness_exercise_service.dart';
 import '../../presentation/auth_controller.dart';
+import '../widgets/exercise_storage_service.dart';
 
 class WeeklyExerciseScreen extends StatefulWidget {
   const WeeklyExerciseScreen({super.key});
@@ -14,6 +18,7 @@ class WeeklyExerciseScreen extends StatefulWidget {
 class _WeeklyExerciseScreenState extends State<WeeklyExerciseScreen> {
   final ExerciseSuggestionService _exerciseService = ExerciseSuggestionService();
   final QuestionnaireService _questionnaireService = QuestionnaireService();
+  final ExerciseStorageService _storageService = ExerciseStorageService();
   final AuthController _authController = Get.find<AuthController>();
 
   Map<String, List<String>> weeklyExercises = {};
@@ -25,16 +30,26 @@ class _WeeklyExerciseScreenState extends State<WeeklyExerciseScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadExercises();
+      _loadInitialPlan();
     });
+  }
+
+  Future<void> _loadInitialPlan() async {
+    final savedPlan = _storageService.getSavedPlan();
+    if (savedPlan != null) {
+      setState(() {
+        weeklyExercises = savedPlan.exercises;
+        _isLoading = false;
+      });
+    } else {
+      await _loadExercises();
+    }
   }
 
   Future<void> _loadUserId() async {
     try {
       _userId = await _authController.getUserIdd();
-      print('User ID loaded: $_userId');
     } catch (e) {
-      print('Error loading user ID: $e');
       _errorMessage = 'Error al cargar el ID de usuario';
     }
   }
@@ -46,8 +61,6 @@ class _WeeklyExerciseScreenState extends State<WeeklyExerciseScreen> {
 
     try {
       await _loadUserId();
-      print('1. User ID after loading: $_userId');
-
       if (_userId == null) {
         setState(() {
           _errorMessage = 'No se pudo obtener el ID de usuario';
@@ -57,8 +70,6 @@ class _WeeklyExerciseScreenState extends State<WeeklyExerciseScreen> {
       }
 
       final questionnaire = await _questionnaireService.getQuestionnaireCompleteByUserId(_userId!);
-      print('2. Questionnaire loaded: ${questionnaire != null}');
-
       if (questionnaire == null) {
         setState(() {
           _errorMessage = 'Por favor completa el cuestionario primero';
@@ -67,10 +78,7 @@ class _WeeklyExerciseScreenState extends State<WeeklyExerciseScreen> {
         return;
       }
 
-      print('3. Generating exercise plan...');
       final exercises = await _exerciseService.generateWeeklyExercises(questionnaire);
-      print('4. Exercise plan generated: ${exercises.length} days');
-
       if (mounted) {
         setState(() {
           weeklyExercises = exercises;
@@ -78,13 +86,31 @@ class _WeeklyExerciseScreenState extends State<WeeklyExerciseScreen> {
         });
       }
     } catch (e) {
-      print('Error in _loadExercises: $e');
       if (mounted) {
         setState(() {
           _errorMessage = 'Error al cargar el plan de ejercicios: $e';
           _isLoading = false;
         });
       }
+    }
+  }
+
+  Future<void> _savePlan() async {
+    try {
+      await _storageService.saveExercisePlan(weeklyExercises);
+      Get.snackbar(
+        'Éxito',
+        'Plan guardado correctamente',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green.withOpacity(0.3),
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'No se pudo guardar el plan',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.withOpacity(0.3),
+      );
     }
   }
 
@@ -95,51 +121,95 @@ class _WeeklyExerciseScreenState extends State<WeeklyExerciseScreen> {
         title: const Text('Plan Semanal de Ejercicios'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _errorMessage.isNotEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        _errorMessage,
-                        style: const TextStyle(color: Colors.red),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _loadExercises,
-                        child: const Text('Reintentar'),
-                      ),
-                    ],
-                  ),
-                )
-              : weeklyExercises.isEmpty
-                  ? const Center(
-                      child: Text('No hay un plan de ejercicios disponible'),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: weeklyExercises.length,
-                      itemBuilder: (context, index) {
-                        final day = 'Día ${index + 1}';
-                        final exercises = weeklyExercises[day] ?? [];
+      body: Column(
+        children: [
+          Expanded(
+            child: _buildContent(),
+          ),
+          _buildButtons(),
+        ],
+      ),
+    );
+  }
 
-                        return Card(
-                          margin: const EdgeInsets.only(bottom: 16),
-                          child: ExpansionTile(
-                            title: Text(
-                              day,
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            children: exercises
-                                .map((exercise) => _buildExerciseTile(exercise))
-                                .toList(),
-                          ),
-                        );
-                      },
-                    ),
+  Widget _buildContent() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_errorMessage.isNotEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              _errorMessage,
+              style: const TextStyle(color: Colors.red),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _loadExercises,
+              child: const Text('Reintentar'),
+            ),
+          ],
+        ),
+      );
+    }
+    if (weeklyExercises.isEmpty) {
+      return const Center(
+        child: Text('No hay un plan de ejercicios disponible'),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: weeklyExercises.length,
+      itemBuilder: (context, index) {
+        final day = 'Día ${index + 1}';
+        final exercises = weeklyExercises[day] ?? [];
+
+        return Card(
+          margin: const EdgeInsets.only(bottom: 16),
+          child: ExpansionTile(
+            title: Text(
+              day,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            children: exercises
+                .map((exercise) => _buildExerciseTile(exercise))
+                .toList(),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildButtons() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          ElevatedButton.icon(
+            onPressed: _savePlan,
+            icon: const Icon(Icons.favorite),
+            label: const Text('Guardar Plan'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            ),
+          ),
+          ElevatedButton.icon(
+            onPressed: _loadExercises,
+            icon: const Icon(Icons.refresh),
+            label: const Text('Generar Nuevo'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

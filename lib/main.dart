@@ -11,6 +11,8 @@ import 'package:personal_trainer/domain/domain/usecases/register_usecase.dart';
 import 'package:personal_trainer/modules/presentation/auth_controller.dart';
 
 import 'domain/core/services/auth_service.dart';
+import 'domain/core/storage/storage_manager.dart';
+import 'modules/exercise/widgets/exercise_storage_service.dart';
 import 'modules/home/pages/home_page.dart';
 import 'modules/presentation/pages/login_page.dart';
 
@@ -35,6 +37,13 @@ void main() async {
 
   // Inicializa y espera el AuthService
   await Get.putAsync(() => AuthService().init());
+  // Inicial el ExerciseStorageService
+  await StorageManager().initializeStorage();
+
+  // Initialize your services
+  final exerciseStorageService = ExerciseStorageService();
+  await exerciseStorageService.init();
+
 
   runApp(const MyApp());
 }
